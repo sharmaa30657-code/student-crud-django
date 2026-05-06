@@ -1,0 +1,202 @@
+{% extends 'students/base.html' %}
+{% block title %}All Students — StudentHub{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  .page-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+  }
+  .total-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+  }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    background: var(--surface);
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .filter-bar input {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.55rem 0.85rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+  }
+  .filter-bar input:focus { border-color: var(--blue); }
+  .filter-bar select {
+    padding: 0.55rem 0.75rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    cursor: pointer;
+  }
+  .filter-bar select option { background: var(--surface); }
+  .filter-bar button {
+    padding: 0.55rem 1.1rem;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .clear-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    padding: 0 0.25rem;
+  }
+  .clear-link:hover { color: var(--text); }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--surface2); }
+  thead th {
+    padding: 0.75rem 1.1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  td { padding: 0.85rem 1.1rem; font-size: 0.88rem; vertical-align: middle; }
+
+  .student-name { font-weight: 600; color: var(--text); }
+  .student-roll { font-size: 0.78rem; color: var(--muted); margin-top: 0.15rem; }
+  .student-email { color: var(--muted); font-size: 0.84rem; }
+  .course-tag {
+    background: var(--blue-dim);
+    color: var(--blue);
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .actions { display: flex; gap: 0.4rem; }
+
+  /* EMPTY */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+  .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+  .empty-state h2 { font-family: 'Syne', sans-serif; font-size: 1.3rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .empty-state p { color: var(--muted); font-size: 0.88rem; margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Students</h1>
+  <span class="total-chip">{{ total }} student{{ total|pluralize }}</span>
+</div>
+
+<form method="get" class="filter-bar">
+  <input type="text" name="q" value="{{ query }}" placeholder="Search by name, email or roll no...">
+  <select name="course">
+    <option value="">All Courses</option>
+    {% for val, label in course_choices %}
+      <option value="{{ val }}" {% if selected_course == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <select name="status">
+    <option value="">All Status</option>
+    {% for val, label in status_choices %}
+      <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Filter</button>
+  {% if query or selected_course or selected_status %}
+    <a href="/students/" class="clear-link">✕ Clear</a>
+  {% endif %}
+</form>
+
+{% if students %}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Email</th>
+        <th>Course</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for student in students %}
+      <tr>
+        <td>
+          <div class="student-name">{{ student.name }}</div>
+          <div class="student-roll"># {{ student.roll_number }}</div>
+        </td>
+        <td class="student-email">{{ student.email }}</td>
+        <td><span class="course-tag">{{ student.get_course_display }}</span></td>
+        <td style="color:var(--muted); font-size:0.84rem;">{{ student.phone|default:"—" }}</td>
+        <td>
+          <span class="badge badge-{{ student.status }}">{{ student.get_status_display }}</span>
+        </td>
+        <td>
+          <div class="actions">
+            <a href="{% url 'student_detail' student.pk %}" class="btn btn-ghost btn-sm">View</a>
+            <a href="{% url 'student_update' student.pk %}" class="btn btn-edit btn-sm">Edit</a>
+            <a href="{% url 'student_delete' student.pk %}" class="btn btn-danger btn-sm">Delete</a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">🎓</div>
+  <h2>No students found</h2>
+  <p>{% if query or selected_course or selected_status %}Try adjusting your search or filters.{% else %}Get started by adding your first student.{% endif %}</p>
+  <a href="{% url 'student_create' %}" class="btn btn-primary">+ Add Student</a>
+</div>
+{% endif %}
+{% endblock %}

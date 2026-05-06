@@ -1,0 +1,54 @@
+{% extends 'students/base.html' %}
+{% block title %}Delete {{ student.name }} — StudentHub{% endblock %}
+
+{% block extra_css %}
+<style>
+  .delete-card {
+    max-width: 500px;
+    background: var(--surface);
+    border: 1px solid var(--red);
+    border-radius: 12px;
+    padding: 2rem;
+  }
+  .delete-card h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    color: var(--red);
+    margin-bottom: 0.75rem;
+  }
+  .delete-card p { color: var(--muted); line-height: 1.6; margin-bottom: 0.5rem; font-size: 0.9rem; }
+  .student-box {
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+  }
+  .student-box .sname { font-weight: 600; font-size: 1rem; }
+  .student-box .smeta { font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; }
+  .warning-text { color: var(--red); font-size: 0.83rem; margin-bottom: 1.5rem; }
+  .delete-actions { display: flex; gap: 0.75rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-card">
+  <h1>⚠ Delete Student</h1>
+  <p>You are about to permanently remove this student record:</p>
+
+  <div class="student-box">
+    <div class="sname">{{ student.name }}</div>
+    <div class="smeta">{{ student.email }} &nbsp;·&nbsp; {{ student.get_course_display }} &nbsp;·&nbsp; # {{ student.roll_number }}</div>
+  </div>
+
+  <p class="warning-text">This action is irreversible and cannot be undone.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="delete-actions">
+      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+      <a href="{% url 'student_detail' student.pk %}" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

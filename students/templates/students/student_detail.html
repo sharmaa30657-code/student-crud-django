@@ -1,0 +1,134 @@
+{% extends 'students/base.html' %}
+{% block title %}{{ student.name }} — StudentHub{% endblock %}
+
+{% block extra_css %}
+<style>
+  .breadcrumb { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.5rem; }
+  .breadcrumb a { color: var(--muted); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--blue); }
+
+  .detail-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 750px;
+  }
+
+  .detail-header {
+    background: linear-gradient(135deg, var(--blue-dim) 0%, var(--surface2) 100%);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    color: white;
+    flex-shrink: 0;
+    border: 3px solid rgba(56,139,253,0.4);
+  }
+  .header-info h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+  .header-meta { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+  .roll-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-family: monospace;
+  }
+
+  .detail-body { padding: 1.75rem 2rem; }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .info-item {}
+  .info-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+  .info-value { font-size: 0.95rem; color: var(--text); }
+  .info-value a { color: var(--blue); text-decoration: none; }
+
+  .detail-actions {
+    display: flex;
+    gap: 0.6rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .timestamps { font-size: 0.75rem; color: var(--muted); margin-top: 1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="/students/">Students</a> › {{ student.name }}
+</div>
+
+<div class="detail-card">
+  <div class="detail-header">
+    <div class="avatar">{{ student.name|first|upper }}</div>
+    <div class="header-info">
+      <h1>{{ student.name }}</h1>
+      <div class="header-meta">
+        <span class="roll-chip"># {{ student.roll_number }}</span>
+        <span class="badge badge-{{ student.status }}">{{ student.get_status_display }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-body">
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Email</div>
+        <div class="info-value"><a href="mailto:{{ student.email }}">{{ student.email }}</a></div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Course</div>
+        <div class="info-value">{{ student.get_course_display }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Phone</div>
+        <div class="info-value">{{ student.phone|default:"Not provided" }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Status</div>
+        <div class="info-value">
+          <span class="badge badge-{{ student.status }}">{{ student.get_status_display }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-actions">
+      <a href="{% url 'student_update' student.pk %}" class="btn btn-edit">Edit Student</a>
+      <a href="{% url 'student_delete' student.pk %}" class="btn btn-danger">Delete</a>
+      <a href="{% url 'student_list' %}" class="btn btn-ghost">← Back</a>
+    </div>
+    <div class="timestamps">
+      Added {{ student.created_at|date:"M j, Y" }} &nbsp;·&nbsp; Updated {{ student.updated_at|date:"M j, Y" }}
+    </div>
+  </div>
+</div>
+{% endblock %}

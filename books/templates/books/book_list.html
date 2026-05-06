@@ -1,0 +1,203 @@
+{% extends 'books/base.html' %}
+
+{% block title %}Folio — All Books{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    line-height: 1;
+  }
+  .page-header h1 em { color: var(--rust); font-style: italic; }
+  .count-badge {
+    font-size: 0.8rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .filter-bar input {
+    flex: 1;
+    min-width: 220px;
+    padding: 0.6rem 1rem;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    outline: none;
+  }
+  .filter-bar input:focus { border-color: var(--ink); }
+  .filter-bar select {
+    padding: 0.6rem 0.9rem;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    outline: none;
+    cursor: pointer;
+  }
+  .filter-bar button {
+    padding: 0.6rem 1.2rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+  }
+  .filter-bar a.clear {
+    padding: 0.6rem 0.9rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+  }
+  .filter-bar a.clear:hover { color: var(--ink); }
+
+  /* BOOK GRID */
+  .book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .book-card {
+    background: var(--white);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .book-card:hover { background: var(--cream); }
+  .book-genre {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+  .book-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    line-height: 1.3;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .book-title:hover { color: var(--rust); }
+  .book-author {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .book-meta {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 0.4rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+  .rating-stars {
+    color: var(--gold);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .book-year { font-size: 0.8rem; color: var(--muted); }
+  .card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 1rem;
+  }
+  .card-actions a {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.75rem;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    border: 1px dashed var(--border);
+  }
+  .empty-state h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+    color: var(--muted);
+  }
+  .empty-state p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>The <em>Library</em></h1>
+  <span class="count-badge">{{ total }} book{{ total|pluralize }}</span>
+</div>
+
+<form method="get" class="filter-bar">
+  <input type="text" name="q" value="{{ query }}" placeholder="Search by title or author...">
+  <select name="genre">
+    <option value="">All Genres</option>
+    {% for val, label in genre_choices %}
+      <option value="{{ val }}" {% if selected_genre == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Search</button>
+  {% if query or selected_genre %}
+    <a href="/" class="clear">✕ Clear</a>
+  {% endif %}
+</form>
+
+{% if books %}
+  <div class="book-grid">
+    {% for book in books %}
+    <div class="book-card">
+      <span class="book-genre">{{ book.get_genre_display }}</span>
+      <a href="{% url 'book_detail' book.pk %}" class="book-title">{{ book.title }}</a>
+      <div class="book-author">{{ book.author }}</div>
+      <div class="book-meta">
+        <span class="rating-stars">★ {{ book.rating }}</span>
+        <span class="book-year">{{ book.year }}</span>
+      </div>
+      <div class="card-actions">
+        <a href="{% url 'book_detail' book.pk %}" class="btn btn-secondary">View</a>
+        <a href="{% url 'book_update' book.pk %}" class="btn btn-edit">Edit</a>
+        <a href="{% url 'book_delete' book.pk %}" class="btn btn-danger">Delete</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <h2>No books found</h2>
+    <p>{% if query or selected_genre %}Try a different search or filter.{% else %}Start building your library today.{% endif %}</p>
+    <a href="{% url 'book_create' %}" class="btn btn-primary">Add First Book</a>
+  </div>
+{% endif %}
+{% endblock %}

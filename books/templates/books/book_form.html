@@ -1,0 +1,61 @@
+{% extends 'books/base.html' %}
+{% block title %}{{ action }} — Folio{% endblock %}
+
+{% block content %}
+<div class="form-card">
+  <h1 class="form-title">{{ action }}</h1>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.title.id_for_label }}">Title</label>
+        {{ form.title }}
+        {% if form.title.errors %}<ul class="errorlist">{% for e in form.title.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.author.id_for_label }}">Author</label>
+        {{ form.author }}
+        {% if form.author.errors %}<ul class="errorlist">{% for e in form.author.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.genre.id_for_label }}">Genre</label>
+        {{ form.genre }}
+        {% if form.genre.errors %}<ul class="errorlist">{% for e in form.genre.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.year.id_for_label }}">Publication Year</label>
+        {{ form.year }}
+        {% if form.year.errors %}<ul class="errorlist">{% for e in form.year.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    </div>
+
+    <div class="form-group" style="max-width: 200px;">
+      <label for="{{ form.rating.id_for_label }}">Rating (0–10)</label>
+      {{ form.rating }}
+      {% if form.rating.errors %}<ul class="errorlist">{% for e in form.rating.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.description.id_for_label }}">Description</label>
+      {{ form.description }}
+      {% if form.description.errors %}<ul class="errorlist">{% for e in form.description.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        {% if book %}Save Changes{% else %}Add to Library{% endif %}
+      </button>
+      {% if book %}
+        <a href="{% url 'book_detail' book.pk %}" class="btn btn-secondary">Cancel</a>
+      {% else %}
+        <a href="{% url 'book_list' %}" class="btn btn-secondary">Cancel</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

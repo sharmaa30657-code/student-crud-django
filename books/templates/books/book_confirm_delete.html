@@ -1,0 +1,52 @@
+{% extends 'books/base.html' %}
+{% block title %}Delete {{ book.title }} — Folio{% endblock %}
+
+{% block extra_css %}
+<style>
+  .delete-card {
+    max-width: 520px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: 4px solid #c0392b;
+    padding: 2.5rem;
+  }
+  .delete-card h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 0.75rem;
+  }
+  .delete-card p { color: var(--muted); line-height: 1.6; margin-bottom: 0.5rem; }
+  .book-highlight {
+    background: var(--cream);
+    border-left: 3px solid #c0392b;
+    padding: 0.75rem 1rem;
+    margin: 1.25rem 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+  }
+  .book-highlight small { display: block; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; }
+  .warning { font-size: 0.85rem; color: #c0392b; margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-card">
+  <h1>Delete Book</h1>
+  <p>You are about to permanently remove:</p>
+
+  <div class="book-highlight">
+    {{ book.title }}
+    <small>by {{ book.author }} &nbsp;·&nbsp; {{ book.year }}</small>
+  </div>
+
+  <p class="warning">⚠ This action cannot be undone.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div style="display:flex; gap: 0.75rem;">
+      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+      <a href="{% url 'book_detail' book.pk %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

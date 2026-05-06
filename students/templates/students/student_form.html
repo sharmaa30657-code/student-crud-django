@@ -1,0 +1,61 @@
+{% extends 'students/base.html' %}
+{% block title %}{{ action }} — StudentHub{% endblock %}
+
+{% block content %}
+<div class="form-card">
+  <h1 class="form-title">{{ action }}</h1>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Full Name *</label>
+        {{ form.name }}
+        {% if form.name.errors %}<ul class="errorlist">{% for e in form.name.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-group">
+        <label>Roll Number *</label>
+        {{ form.roll_number }}
+        {% if form.roll_number.errors %}<ul class="errorlist">{% for e in form.roll_number.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Email Address *</label>
+      {{ form.email }}
+      {% if form.email.errors %}<ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Course *</label>
+        {{ form.course }}
+        {% if form.course.errors %}<ul class="errorlist">{% for e in form.course.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        {{ form.phone }}
+        {% if form.phone.errors %}<ul class="errorlist">{% for e in form.phone.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    </div>
+
+    <div class="form-group" style="max-width:220px;">
+      <label>Status</label>
+      {{ form.status }}
+      {% if form.status.errors %}<ul class="errorlist">{% for e in form.status.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        {% if student %}Save Changes{% else %}Add Student{% endif %}
+      </button>
+      {% if student %}
+        <a href="{% url 'student_detail' student.pk %}" class="btn btn-ghost">Cancel</a>
+      {% else %}
+        <a href="{% url 'student_list' %}" class="btn btn-ghost">Cancel</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}
